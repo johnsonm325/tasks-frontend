@@ -14,10 +14,11 @@ import {
 import FlexibleFlex from '../../PresentationalComponents/FlexibleFlex/FlexibleFlex';
 import AvailableTasks from '../AvailableTasks/AvailableTasks';
 import CompletedTasksTable from '../../SmartComponents/CompletedTasksTable/CompletedTasksTable';
-import { fetchAvailableTask } from '../../../api';
+import { fetchAvailableTask, fetchExecutedTasks } from '../../../api';
 import { dispatchNotification } from '../../Utilities/Dispatcher';
 
 import './tasks-page.scss';
+import { createNotification, isError } from '../completedTaskDetailsHelpers';
 
 const TasksPage = ({ tab }) => {
   const history = useHistory();
@@ -25,12 +26,31 @@ const TasksPage = ({ tab }) => {
   const [runTaskModalOpened, setRunTaskModalOpened] = useState(false);
   const [activeTask, setActiveTask] = useState({});
   const [error, setError] = useState();
+  //const [activityError, setActivityError] = useState();
+  const [tabsLoading, setTabsLoading] = useState(true);
+  const [tasksRunning, setTasksRunning] = useState(false);
 
   useEffect(() => {
     if (tab === 0) {
       history.push('available');
     }
   }, []);
+
+  useEffect(async () => {
+    if (tabsLoading) {
+      const path = `?limit=1000&offset=0`;
+      let activities = await fetchExecutedTasks(path);
+      if (isError(activities)) {
+        createNotification(activities);
+        //setActivityError(activities);
+      } else {
+        if (activities.data.some((task) => task.status === 'Running')) {
+          setTasksRunning(true);
+          setTabsLoading(false);
+        }
+      }
+    }
+  }, [tabsLoading]);
 
   const updateTab = (event, index) => {
     history.push(index ? 'executed' : 'available');
@@ -77,6 +97,9 @@ const TasksPage = ({ tab }) => {
         tabIndex={tabIndex}
         updateTab={updateTab}
         tabsList={TASKS_PAGE_TABS}
+        tabsLoading={tabsLoading}
+        //setTabsLoading={setTabsLoading}
+        tasksRunning={tasksRunning}
       />
       <Main>
         <Stack hasGutter>
