@@ -26,9 +26,12 @@ import {
   isError,
 } from '../completedTaskDetailsHelpers';
 import RunTaskModal from '../RunTaskModal/RunTaskModal';
+import { useLocation, useHistory } from 'react-router-dom';
+import { buildFilterSortString, updateURLParams } from './helpers';
 
 const ActivityTable = () => {
   const [activities, setActivities] = useState(LOADING_ACTIVITIES_TABLE);
+  const [totalTasks, setTotalTasks] = useState();
   const [activityDetails, setActivityDetails] = useState(TASK_LOADING_CONTENT);
   const [tableLoading, setTableLoading] = useState(true);
   const [error, setError] = useState();
@@ -41,6 +44,40 @@ const ActivityTable = () => {
   const [taskDetails, setTaskDetails] = useState({});
   const [runTaskModalOpened, setRunTaskModalOpened] = useState(false);
   const [selectedSystems, setSelectedSystems] = useState([]);
+  const [searchParams, setSearchParams] = useState({ limit: 20, offset: 0 });
+  const location = useLocation();
+  const history = useHistory();
+
+  useEffect(() => {
+    const queryParameters = new URLSearchParams(location.search);
+    console.log(queryParameters, 'queryParameters');
+    let limit = queryParameters.get('limit');
+    if (!limit) {
+      queryParameters.append('limit', '20');
+      limit = queryParameters.get('limit');
+    }
+
+    let offset = queryParameters.get('offset');
+    if (!offset) {
+      queryParameters.append('offset', '0');
+      offset = queryParameters.get('offset');
+    }
+
+    updateURLParams(history, limit, offset);
+    setSearchParams({ limit, offset });
+  }, []);
+
+  useEffect(() => {
+    updateURLParams(history, searchParams.limit, searchParams.offset);
+    refetchData();
+  }, [searchParams]);
+
+  const updateSearchParams = (params) => {
+    setSearchParams({
+      ...searchParams,
+      ...params,
+    });
+  };
 
   const fetchTaskDetails = async (id) => {
     setTaskError();
@@ -62,7 +99,7 @@ const ActivityTable = () => {
   };
 
   const fetchData = async () => {
-    const path = `?limit=500&offset=0`;
+    const path = buildFilterSortString(searchParams);
     const result = await fetchExecutedTasks(path);
 
     setTasks(result);
@@ -90,6 +127,7 @@ const ActivityTable = () => {
       );
 
       await setActivities(result.data);
+      await setTotalTasks(result.meta.count);
       setTableLoading(false);
     }
   };
@@ -170,10 +208,14 @@ const ActivityTable = () => {
                 ...TASKS_TABLE_DEFAULTS.exportable,
                 columns: exportableColumns,
               },
+              perPage: searchParams.limit,
+              page: searchParams.offset + 1,
+              totalTasks: totalTasks,
             }}
             emptyRows={emptyRows('tasks')}
             isStickyHeader
             isTableLoading={tableLoading}
+            updateSearchParams={updateSearchParams}
           />
         )}
       </div>

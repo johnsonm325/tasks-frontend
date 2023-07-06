@@ -15,13 +15,14 @@ const useTableTools = (
   items = [],
   columns = [],
   options = {},
-  isTableLoading
+  isTableLoading,
+  updateSearchParams
 ) => {
   const {
     toolbarProps: paginationToolbarProps,
     setPage,
-    paginator,
-  } = usePaginate(options, isTableLoading);
+    //paginator,
+  } = usePaginate(options, isTableLoading, updateSearchParams);
 
   const {
     toolbarProps: conditionalFilterProps,
@@ -62,7 +63,8 @@ const useTableTools = (
     emptyRows: options.tableProps.emptyRows,
     rowTransformer: [openItem],
     pagination: paginationToolbarProps?.pagination,
-    paginator,
+    totalTasks: options.totalTasks,
+    //paginator,
     filter,
     sorter,
   });

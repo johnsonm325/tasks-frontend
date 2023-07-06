@@ -31,13 +31,14 @@ const useRowsBuilder = (items, columns, options = {}) => {
 
   const filteredItems = options?.filter ? options.filter(items) : items;
 
-  const sortedItems = options?.sorter
+  /*const sortedItems = options?.sorter
     ? options.sorter(filteredItems)
-    : filteredItems;
+    : filteredItems;*/
 
-  const paginatedItems = options?.paginator
+  /*const paginatedItems = options?.paginator
     ? options?.paginator(filteredItems)
-    : sortedItems;
+    : sortedItems;*/
+  const paginatedItems = filteredItems;
 
   let parentIndex = -1;
   let row;
@@ -57,7 +58,8 @@ const useRowsBuilder = (items, columns, options = {}) => {
   const pagination = options?.pagination
     ? {
         ...options.pagination,
-        itemCount: filteredItems.length,
+        //itemCount: filteredItems.length,
+        itemCount: options?.totalTasks,
       }
     : undefined;
 

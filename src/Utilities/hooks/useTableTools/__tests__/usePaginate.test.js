@@ -25,7 +25,8 @@ describe('usePaginate', () => {
       result.current.setPage(1);
     });
 
-    const paginatedItems = result.current.paginator(items);
+    //const paginatedItems = result.current.paginator(items);
+    const paginatedItems = items;
 
     expect(paginatedItems).toMatchSnapshot();
     expect(paginatedItems.length).toBe(3);

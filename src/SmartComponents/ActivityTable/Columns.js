@@ -33,7 +33,7 @@ const StatusCell = ({ status }) =>
   }[status] || status);
 
 StatusCell.propTypes = {
-  status: propTypes.string,
+  status: propTypes.node,
 };
 
 export const TaskColumn = {

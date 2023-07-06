@@ -15,6 +15,7 @@ const TasksTables = ({
   filters = [],
   options = {},
   //toolbarProps: toolbarPropsProp,
+  updateSearchParams,
   ...tablePropsRest
 }) => {
   const { toolbarProps, tableProps } = useTableTools(
@@ -25,7 +26,8 @@ const TasksTables = ({
       tableProps: tablePropsRest,
       ...options,
     },
-    isTableLoading
+    isTableLoading,
+    updateSearchParams
   );
 
   return (
@@ -69,6 +71,7 @@ TasksTables.propTypes = {
   filters: propTypes.object,
   options: propTypes.object,
   toolbarProps: propTypes.object,
+  updateSearchParams: propTypes.func,
 };
 
 export default TasksTables;
